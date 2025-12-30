@@ -1,139 +1,131 @@
-# LOOQ Backend
+# LOOQ Mobile App
 
-FastAPI backend for fashion recognition and outfit recommendations.
+Flutter mobile application for fashion recognition and shopping.
 
 ## Features
 
-- 🎯 Garment recognition (MVP: tops only)
-- 🛍️ Product search from multiple e-commerce providers
-- 👔 Outfit recommendation engine
-- 🚀 Fast, async API with FastAPI
-- 📊 PostgreSQL database with pgvector
-- 🔄 Redis caching
-- 📝 OpenAPI/Swagger documentation
+- 📸 Camera integration for taking photos
+- 🖼️ Image gallery selection
+- 🔍 Real-time garment recognition
+- 🛍️ Product browsing and purchase links
+- 👔 Outfit recommendations
+- 🎨 Modern, clean UI
 
-## Quick Start
+## Setup
 
-### 1. Setup Environment
+### Prerequisites
 
+- Flutter SDK 3.0+
+- Android Studio / Xcode
+- iOS Simulator or Android Emulator / Physical device
+
+### Installation
+
+1. Install dependencies:
 ```bash
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-pip install -r requirements.txt
+flutter pub get
 ```
 
-### 2. Configure Environment
+2. Configure API endpoint:
 
-Copy `.env.example` to `.env` and configure:
+Edit `lib/core/config/app_config.dart`:
+```dart
+// For Android emulator
+static const String _baseUrl = 'http://10.0.2.2:8000';
 
-```bash
-cp .env.example .env
-# Edit .env with your settings
+// For iOS simulator
+static const String _baseUrl = 'http://localhost:8000';
+
+// For physical device (use your computer's IP)
+static const String _baseUrl = 'http://192.168.1.100:8000';
 ```
 
-### 3. Start Services
-
-Using Docker Compose (recommended):
+3. Run the app:
 ```bash
-docker-compose up -d postgres redis
+flutter run
 ```
-
-Or manually start PostgreSQL and Redis.
-
-### 4. Run Database Migrations
-
-```bash
-alembic upgrade head
-```
-
-### 5. Start Server
-
-```bash
-uvicorn app.main:app --reload
-```
-
-Visit:
-- API: http://localhost:8000
-- Docs: http://localhost:8000/docs
-- ReDoc: http://localhost:8000/redoc
 
 ## Project Structure
 
 ```
-app/
-├── api/              # API endpoints
-│   └── v1/
-│       ├── endpoints/  # Route handlers
-│       └── router.py   # Router configuration
-├── core/             # Core configuration
-│   ├── config.py      # Settings
-│   └── logging.py     # Logging setup
-├── domain/           # Business logic
-│   ├── entities/      # Domain entities
-│   └── services/      # Domain services
-└── infrastructure/   # External integrations
-    ├── database/      # Database models & session
-    ├── ml/            # ML models & services
-    └── external_apis/ # E-commerce APIs
+lib/
+├── core/              # Core functionality
+│   ├── config/        # App configuration
+│   ├── di/            # Dependency injection
+│   ├── routing/       # Navigation
+│   └── theme/         # App theming
+├── data/              # Data layer
+│   ├── datasources/   # API clients
+│   └── repositories/  # Repository implementations
+├── domain/            # Business logic
+│   └── repositories/  # Repository interfaces
+└── features/          # Feature modules
+    ├── camera/        # Camera feature
+    ├── home/          # Home screen
+    └── results/       # Results screen
 ```
 
-## API Endpoints
+## Features
 
-### Main Endpoint
+### Camera Screen
+- Take photo with camera
+- Select image from gallery
+- Image upload and analysis
 
-**POST** `/api/v1/complete/analyze`
-
-Upload an image and get:
-- Garment recognition
-- Similar products
-- Outfit recommendations
-
-See [API Documentation](../docs/API.md) for details.
+### Results Screen
+- **Products Tab**: Browse similar products with buy links
+- **Outfits Tab**: View outfit recommendations
 
 ## Development
 
-### Running Tests
+### Build for Release
 
 ```bash
-pytest
+# Android
+flutter build apk --release
+
+# iOS
+flutter build ios --release
+```
+
+### Run Tests
+
+```bash
+flutter test
 ```
 
 ### Code Formatting
 
 ```bash
-black app/
-isort app/
+dart format lib/
 ```
 
-### Database Migrations
+## Platform-Specific Setup
 
-```bash
-# Create migration
-alembic revision --autogenerate -m "Description"
+### Android
 
-# Apply migrations
-alembic upgrade head
+Add permissions in `android/app/src/main/AndroidManifest.xml`:
 
-# Rollback
-alembic downgrade -1
+```xml
+<uses-permission android:name="android.permission.CAMERA"/>
+<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+<uses-permission android:name="android.permission.INTERNET"/>
 ```
 
-## MVP Limitations
+### iOS
 
-Current MVP focuses on:
-- ✅ Tops only (shirts, t-shirts, blouses, etc.)
-- ✅ Basic rule-based outfit generation
-- ✅ Mock e-commerce providers (configure real APIs in production)
-- ✅ Simple heuristic-based recognition (replace with trained ML model)
+Add permissions in `ios/Runner/Info.plist`:
 
-## Next Steps for Production
+```xml
+<key>NSCameraUsageDescription</key>
+<string>We need camera access to take photos of clothing items</string>
+<key>NSPhotoLibraryUsageDescription</key>
+<string>We need photo library access to select clothing images</string>
+```
 
-1. Train/fine-tune garment recognition model (ViT or ResNet)
-2. Implement CLIP embeddings for visual search
-3. Set up FAISS index for similarity search
-4. Integrate real e-commerce APIs (Amazon PA-API, Zalando)
-5. Implement ML-based outfit recommendation model
-6. Add user authentication (Firebase Auth)
-7. Set up production infrastructure (AWS/GCP)
-8. Implement monitoring and logging
+## Troubleshooting
+
+- **API connection errors**: Check API base URL matches your backend address
+- **Camera not working**: Ensure permissions are granted
+- **Build errors**: Run `flutter clean` and `flutter pub get`
 
